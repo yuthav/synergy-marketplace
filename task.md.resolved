@@ -1,0 +1,91 @@
+# Synergetics.ai Marketplace Platform — Task Breakdown
+
+## Phase 1: Monorepo & Foundation
+- [ ] Initialize Turborepo monorepo structure with all apps and packages
+- [ ] Configure shared TypeScript, ESLint, Prettier configs
+- [ ] Set up `packages/types` — shared Zod schemas & TypeScript types
+- [ ] Set up `packages/utils` — shared utility functions
+- [ ] Set up `packages/ui` — shadcn/ui shared component library (dark theme)
+- [ ] Set up `packages/db` — Drizzle ORM schema, migrations, seed data
+- [ ] Set up `packages/wallet` — Web3 wallet utilities
+- [ ] Set up `packages/x402` — x402 protocol SDK
+- [ ] Set up `packages/api-client` — typed API client
+- [ ] Create `.env.example` with all variables documented
+
+## Phase 2: Database Schema & Migrations
+- [ ] Create Drizzle schemas for all entities (users, sellers, wallets, listings, etc.)
+- [ ] Add indexes, constraints, relations
+- [ ] Create seed data script
+- [ ] Create MongoDB schemas (audit_logs, listing_metadata, analytics_events)
+
+## Phase 3: API Server (Fastify)
+- [ ] Set up Fastify 5.x with TypeScript
+- [ ] Auth middleware (Clerk + SIWE)
+- [ ] All REST endpoints (/auth, /listings, /categories, /cart, /checkout, /me, /seller, /admin, /x402, /webhooks)
+- [ ] OpenAPI 3.1 auto-generation via @fastify/swagger
+- [ ] Background jobs (BullMQ)
+- [ ] Event bus (NATS JetStream)
+- [ ] Request logging (pino) with correlation IDs
+- [ ] Error handling middleware
+- [ ] Health check endpoints
+
+## Phase 4: Marketplace Frontend (Buyer-Facing)
+- [ ] Next.js 15 App Router setup with Tailwind CSS 4 + shadcn/ui
+- [ ] Homepage (hero, featured, trending, categories)
+- [ ] Category pages with faceted filters
+- [ ] Search with autocomplete
+- [ ] Product Detail Page (media gallery, pricing, reviews, 3D preview)
+- [ ] Shopping cart (subscriptions + one-time)
+- [ ] Checkout flow (Stripe, crypto, x402, Visa, Synergetics Pay)
+- [ ] Buyer Profile Hub (dashboard, purchases, subscriptions, wallet, invoices, API keys, security)
+- [ ] Review & rating system
+
+## Phase 5: Seller Portal
+- [ ] Next.js 15 App Router setup
+- [ ] Onboarding wizard
+- [ ] Dashboard (revenue, orders, subscribers, alerts)
+- [ ] Listing management (CRUD, rich text, media, variants, pricing, versions)
+- [ ] Bulk operations (CSV/JSON import/export)
+- [ ] Order & subscription management
+- [ ] Finance dashboard (charts, ledger, payouts, tax docs)
+- [ ] Team management (RBAC)
+- [ ] Analytics (sales, conversion, MRR, churn, LTV, cohorts)
+- [ ] Compliance (KYB, DMCA, audit log)
+- [ ] Messaging & notifications
+
+## Phase 6: Admin Dashboard
+- [ ] Next.js 15 App Router setup
+- [ ] User management (search, suspend, roles)
+- [ ] Listing moderation queue
+- [ ] Financial overview
+- [ ] Dispute management
+- [ ] Platform analytics
+- [ ] System health monitoring
+- [ ] Configuration management
+
+## Phase 7: Payment Integrations
+- [ ] Stripe Connect, Billing, Checkout, Tax, Webhooks
+- [ ] Web3 wallet payments (EVM + Solana)
+- [ ] x402 protocol (facilitator, client flow)
+- [ ] Visa Intelligent Payments stub
+- [ ] Synergetics Pay (stored balance, credits)
+- [ ] Unified transaction ledger
+
+## Phase 8: Testing
+- [ ] Unit tests (Vitest) for business logic
+- [ ] Integration tests (Vitest + Supertest) for API endpoints
+- [ ] E2E tests (Playwright) for critical flows
+
+## Phase 9: Infrastructure & Deployment
+- [ ] Multi-stage Dockerfiles (dev + prod)
+- [ ] docker-compose.yml (full local stack)
+- [ ] Helm charts (Kubernetes)
+- [ ] Terraform modules (AWS EKS, RDS, ElastiCache, S3, CloudFront, Route53, ACM, IAM)
+- [ ] GitHub Actions CI/CD pipelines
+- [ ] Nginx reverse proxy config
+
+## Phase 10: Verification
+- [ ] Full local stack runs via docker-compose
+- [ ] All pages render correctly
+- [ ] API endpoints return correct responses
+- [ ] Seed data populates properly

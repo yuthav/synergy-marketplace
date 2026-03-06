@@ -1,0 +1,182 @@
+# Synergetics.ai AI Agent & Digital Goods Marketplace
+
+Build a production-grade, two-sided marketplace platform with Buyer Marketplace, Seller Portal, Admin Dashboard, and API Server as a Turborepo monorepo.
+
+## User Review Required
+
+> [!IMPORTANT]
+> **This is an extremely large project.** I'll build it incrementally across multiple phases. Each phase will produce working, runnable code before moving to the next. Phase 1-4 are the foundation; Phases 5-10 layer on top. I'll verify at each phase boundary.
+
+> [!WARNING]
+> **External service dependencies** — Clerk, Stripe, Elasticsearch, NATS, ClickHouse, MongoDB require API keys or running instances. I'll stub/mock these integrations so the app runs locally without them, with clear `.env.example` documentation for production setup.
+
+> [!CAUTION]
+> **Scope management** — Full production deployment of all features would take a team months. I'll implement all specified features with proper architecture, types, and UI, but some external integrations (Persona KYC, Visa, CoinGecko live feeds) will be well-structured stubs ready for real API keys.
+
+---
+
+## Proposed Changes
+
+### Phase 1: Monorepo Foundation
+
+#### [NEW] Root Configuration Files
+- `package.json` — pnpm workspace root with shared scripts
+- `turbo.json` — Turborepo pipeline config (build, dev, lint, test, type-check)
+- `pnpm-workspace.yaml` — workspace definition
+- `tsconfig.base.json` — shared TypeScript strict config
+- `.eslintrc.js` — shared ESLint with TypeScript rules
+- `.prettierrc` — Prettier config
+- `.env.example` — all environment variables documented
+- `.gitignore`
+
+#### [NEW] `packages/types/`
+Shared Zod schemas + TypeScript types for all entities: User, Seller, Listing, Order, Cart, Subscription, Review, Invoice, Transaction, Wallet, ApiKey, Message, Category, etc. All API request/response schemas.
+
+#### [NEW] `packages/utils/`
+Shared utilities: currency formatting, date helpers, slugify, crypto address validation, pagination helpers, error classes.
+
+#### [NEW] `packages/ui/`
+shadcn/ui component library with dark theme. Components: Button, Card, Input, Select, Dialog, Table, Badge, Avatar, Tabs, Dropdown, Toast, Sidebar, DataTable, Chart wrappers, and custom marketplace components (PriceDisplay, RatingStars, CategoryCard, ListingCard, WalletConnect).
+
+#### [NEW] `packages/db/`
+Drizzle ORM schema for 25+ PostgreSQL tables with full relations, indexes, constraints. Migration files. Seed data script with realistic demo data. MongoDB/Mongoose schemas for audit_logs, listing_metadata, analytics_events.
+
+#### [NEW] `packages/wallet/`
+Web3 wallet utilities: EVM (wagmi/viem) and Solana (@solana/wallet-adapter) connection, SIWE message generation/verification, transaction builders, balance queries.
+
+#### [NEW] `packages/x402/`
+x402 protocol client: payment header generation, facilitator client (verify/settle calls), resource access with auto-payment.
+
+#### [NEW] `packages/api-client/`
+Typed API client generated from OpenAPI spec. Axios-based with interceptors for auth, error handling, retry logic.
+
+---
+
+### Phase 2: Database Schema
+
+#### [NEW] `packages/db/src/schema/`
+Complete Drizzle ORM schemas covering all 25+ entities:
+- `users.ts` — users, wallets, notification_preferences, api_keys
+- `sellers.ts` — sellers, seller_team_members
+- `listings.ts` — listings, listing_media, pricing, categories, collections, collection_items
+- `orders.ts` — orders, order_items, subscriptions
+- `commerce.ts` — cart, cart_items, invoices, reviews
+- `finance.ts` — transactions (unified ledger), payouts, disputes, platform_credits
+- `messaging.ts` — messages, message_threads
+- `audit.ts` — audit_logs
+
+All with: indexes, unique constraints, check constraints, created_at/updated_at defaults, soft delete (deleted_at), and full Drizzle relations.
+
+#### [NEW] `packages/db/src/seed.ts`
+Seed script creating: 50 users, 10 sellers, 200 listings across 6 categories, sample orders, reviews, and transactions.
+
+#### [NEW] `packages/db/src/mongo/`
+Mongoose schemas for flexible document storage.
+
+---
+
+### Phase 3: API Server (Fastify)
+
+#### [NEW] `apps/api/`
+Full Fastify 5.x API server with:
+- **Middleware:** Auth (Clerk JWT verification), CORS, rate limiting, request logging (pino), correlation IDs, error handler
+- **Routes:** All endpoint groups (/auth, /listings, /categories, /cart, /checkout, /me, /seller, /admin, /x402, /webhooks)
+- **Services:** Business logic layer for each domain
+- **OpenAPI:** Auto-generated spec via @fastify/swagger + zod-to-openapi
+- **Jobs:** BullMQ background job processors (email, indexing, payouts)
+- **Health:** /health endpoint for all services
+
+---
+
+### Phase 4: Marketplace Frontend (Buyer-Facing)
+
+#### [NEW] `apps/marketplace/`
+Next.js 15 App Router with:
+- **Layout:** Dark theme, glassmorphism nav, responsive sidebar, footer
+- **Homepage:** Animated hero, featured listings grid, trending, new arrivals, top sellers, category cards
+- **Category Pages:** Faceted filters (price, rating, model, blockchain, sort), listing grid
+- **Search:** Full-text search with autocomplete dropdown
+- **Product Detail Page:** Media gallery, pricing with currency toggle, subscribe/buy CTA, version history, seller card, reviews, related listings
+- **3D Preview:** React Three Fiber viewer for avatars/wearables
+- **Cart:** Mixed items support, quantity management
+- **Checkout:** Multi-step with payment method selection
+- **Buyer Hub:** Dashboard, purchases, subscriptions, wallet, invoices, messages, API keys, security
+- **Auth Pages:** Sign in/up with Clerk + Web3 wallet connect
+
+---
+
+### Phase 5: Seller Portal
+
+#### [NEW] `apps/seller-portal/`
+Next.js 15 App Router with:
+- **Onboarding Wizard:** 4-step flow (business info → KYB → Stripe Connect → first listing)
+- **Dashboard:** Revenue cards, recent orders, subscriber count, alert banners
+- **Listings:** Full CRUD with Tiptap rich text, drag-drop media, variant/tier management, pricing engine, draft/published/archived states, version changelog
+- **Bulk Ops:** CSV/JSON import/export
+- **Orders:** Table with fulfillment status, refund initiation
+- **Subscriptions:** Subscriber list, churn indicators
+- **Finance:** Revenue charts (Recharts), transaction ledger, payout settings, tax docs
+- **Team:** Invite members, RBAC roles, activity log
+- **Analytics:** Sales charts, conversion funnel, MRR, churn, LTV, cohort analysis
+- **Compliance:** KYB status, DMCA management, audit log
+- **Messaging:** Buyer communication, support tickets
+
+---
+
+### Phase 6: Admin Dashboard
+
+#### [NEW] `apps/admin/`
+Next.js 15 App Router with:
+- User management, listing moderation queue, financial overview, dispute management, platform analytics, system health, configuration panels
+
+---
+
+### Phase 7: Payment Integrations
+
+Implement across `apps/api/` and frontend apps:
+- Stripe Connect (multi-party), Billing, Checkout, Tax, Webhooks
+- Web3 wallet payments (EVM + Solana)
+- x402 protocol facilitator + client
+- Visa API stub
+- Synergetics Pay (internal balance)
+- Unified transaction ledger
+
+---
+
+### Phase 8: Testing
+
+- Unit tests (Vitest) in `packages/*/` and `apps/api/`
+- Integration tests (Vitest + Supertest) for API endpoints
+- E2E tests (Playwright) for registration, listing creation, checkout
+
+---
+
+### Phase 9: Infrastructure
+
+#### [NEW] `infrastructure/`
+- Multi-stage Dockerfiles (dev + prod) for each app
+- `docker-compose.yml` — full local stack
+- Helm charts for Kubernetes
+- Terraform modules for AWS (EKS, RDS, ElastiCache, S3, CloudFront, Route53, ACM, IAM)
+- GitHub Actions CI/CD (PR checks, staging, production)
+- Nginx reverse proxy config
+
+---
+
+## Verification Plan
+
+### Automated Tests
+1. **TypeScript compilation:** `pnpm turbo type-check` — all packages and apps compile with strict mode
+2. **Lint:** `pnpm turbo lint` — all code passes ESLint rules
+3. **Unit tests:** `pnpm turbo test` — Vitest tests pass for business logic in packages and API
+4. **Build:** `pnpm turbo build` — all apps and packages build successfully
+
+### Browser Verification (after each phase)
+1. **Phase 4:** Navigate to marketplace at `http://localhost:3000`, verify homepage renders with hero, listings, categories. Test search, product detail page, cart, and checkout flow.
+2. **Phase 5:** Navigate to seller portal at `http://localhost:3001`, verify onboarding wizard, dashboard, listing CRUD, analytics charts.
+3. **Phase 6:** Navigate to admin at `http://localhost:3002`, verify user management, moderation queue, analytics.
+
+### Manual Verification
+- Run `docker-compose up` and verify all services start
+- Seed the database and verify data appears in marketplace
+- Test responsive layout at mobile/tablet/desktop breakpoints

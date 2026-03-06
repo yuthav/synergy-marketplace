@@ -1,0 +1,27 @@
+{
+    "name": "@synergetics/wallet",
+    "version": "1.0.0",
+    "private": true,
+    "type": "module",
+    "main": "./dist/index.js",
+    "types": "./dist/index.d.ts",
+    "exports": {
+        ".": {
+            "types": "./dist/index.d.ts",
+            "import": "./dist/index.js"
+        }
+    },
+    "scripts": {
+        "build": "tsc",
+        "type-check": "tsc --noEmit",
+        "clean": "rm -rf dist .turbo"
+    },
+    "dependencies": {
+        "@synergetics/types": "workspace:*",
+        "viem": "^2.21.0",
+        "zod": "^3.24.1"
+    },
+    "devDependencies": {
+        "typescript": "^5.7.2"
+    }
+}
