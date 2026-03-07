@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Image from 'next/image';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
@@ -25,14 +26,11 @@ export default function PlatformLayout({ children }: { children: React.ReactNode
                     {/* ─── Sidebar ─── */}
                     <aside className="glass hidden lg:flex lg:w-64 flex-col border-r border-white/[0.055] fixed inset-y-0 left-0 z-50">
                         {/* Logo */}
-                        <div className="flex h-14 items-center gap-2.5 px-5 border-b border-white/[0.055]">
-                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#f59e0b] to-[#ef4444] flex items-center justify-center">
-                                <span className="text-[10px] font-black text-white">HQ</span>
-                            </div>
-                            <div>
-                                <span className="text-sm font-bold text-white">Platform HQ</span>
-                                <p className="text-[9px] text-[#4b5563] leading-none mt-0.5">Synergetics.ai</p>
-                            </div>
+                        <div className="flex h-14 items-center justify-between px-4 border-b border-white/[0.055]">
+                            <a href="/" className="flex items-center">
+                                <Image src="/logo.svg" alt="Synergetics.ai" width={120} height={30} className="h-7 w-auto" priority />
+                            </a>
+                            <span className="badge bg-gradient-to-r from-[#f59e0b] to-[#ef4444] text-[#0a0a1a] font-black text-[9px] border-0">HQ</span>
                         </div>
 
                         {/* Nav */}

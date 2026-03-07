@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Image from 'next/image';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], display: 'swap' });
@@ -24,11 +25,10 @@ export default function SellerLayout({ children }: { children: React.ReactNode }
                     {/* ─── Sidebar ─── */}
                     <aside className="glass hidden lg:flex lg:w-60 flex-col border-r border-white/[0.065] fixed inset-y-0 left-0 z-50">
                         {/* Logo */}
-                        <div className="flex h-14 items-center gap-2.5 px-5 border-b border-white/[0.065]">
-                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-[#3b82f6] to-[#8b5cf6] flex items-center justify-center">
-                                <svg width="13" height="13" viewBox="0 0 20 20" fill="none"><path d="M5 10.5L8.5 14L15 7" stroke="white" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                            </div>
-                            <span className="text-sm font-bold text-white">Seller Portal</span>
+                        <div className="flex h-14 items-center px-4 border-b border-white/[0.065]">
+                            <a href="/" className="flex items-center">
+                                <Image src="/logo.svg" alt="Synergetics.ai" width={130} height={32} className="h-8 w-auto" priority />
+                            </a>
                         </div>
 
                         {/* Nav */}

@@ -1,6 +1,7 @@
 /* ─── Synergetics Marketplace — Root Layout ─── */
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
+import Image from 'next/image';
 import './globals.css';
 
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter', display: 'swap' });
@@ -32,14 +33,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                 <header className="glass sticky top-0 z-40 w-full border-b border-white/[0.07]">
                     <div className="mx-auto flex h-16 max-w-screen-xl items-center justify-between px-4 sm:px-6 lg:px-8">
                         {/* Logo */}
-                        <a href="/" className="flex items-center gap-2.5 shrink-0">
-                            <div className="relative flex h-8 w-8 items-center justify-center rounded-xl bg-gradient-to-br from-[#3b82f6] to-[#8b5cf6]">
-                                <svg width="18" height="18" viewBox="0 0 20 20" fill="none">
-                                    <path d="M5 10.5L8.5 14L15 7" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" />
-                                </svg>
-                                <div className="absolute inset-0 rounded-xl bg-gradient-to-br from-white/10 to-transparent" />
-                            </div>
-                            <span className="text-[1.05rem] font-bold tracking-[-0.02em] text-white">Synergetics<span className="g-text-brand">.ai</span></span>
+                        <a href="/" className="flex items-center shrink-0">
+                            <Image src="/logo.svg" alt="Synergetics.ai" width={160} height={40} className="h-9 w-auto" priority />
                         </a>
 
                         {/* Nav Links */}
@@ -78,11 +73,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
                         <div className="grid grid-cols-2 md:grid-cols-5 gap-10">
                             {/* Brand */}
                             <div className="col-span-2 md:col-span-1">
-                                <a href="/" className="flex items-center gap-2 mb-4">
-                                    <div className="flex h-7 w-7 items-center justify-center rounded-lg bg-gradient-to-br from-[#3b82f6] to-[#8b5cf6]">
-                                        <svg width="15" height="15" viewBox="0 0 20 20" fill="none"><path d="M5 10.5L8.5 14L15 7" stroke="white" strokeWidth="2.2" strokeLinecap="round" strokeLinejoin="round" /></svg>
-                                    </div>
-                                    <span className="font-bold text-white text-sm">Synergetics.ai</span>
+                                <a href="/" className="flex items-center mb-4">
+                                    <Image src="/logo.svg" alt="Synergetics.ai" width={120} height={30} className="h-7 w-auto" />
                                 </a>
                                 <p className="text-[#6b7280] text-xs leading-relaxed max-w-[180px]">The premier marketplace for the AI economy.</p>
                                 <div className="flex gap-3 mt-5">
