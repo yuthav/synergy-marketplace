@@ -234,9 +234,174 @@ Cross-portal navigation links are provided on each sign-in page for convenience.
 
 ---
 
-## 🐳 Docker (Coming Soon)
+## 🐳 Docker
 
-Docker Compose support for all services is planned. For now, run locally using the `pnpm dev` command above with a PostgreSQL instance (e.g. [Neon](https://neon.tech) for serverless Postgres).
+The entire platform runs as a containerised stack. Six services are orchestrated via Docker Compose:
+
+| Service | Image | Port |
+|---|---|---|
+| `postgres` | `postgres:17-alpine` | 5432 |
+| `redis` | `redis:7-alpine` | 6379 |
+| `api` | Built from `apps/api/Dockerfile` | 4000 |
+| `marketplace` | Built from `apps/marketplace/Dockerfile` | 3000 |
+| `seller-portal` | Built from `apps/seller-portal/Dockerfile` | 3001 |
+| `platform-mgmt` | Built from `apps/platform-mgmt/Dockerfile` | 3002 |
+| `nginx` | `nginx:alpine` | 80, 443 |
+
+### Prerequisites
+
+| Requirement | Version |
+|---|---|
+| Docker | ≥ 26 |
+| Docker Compose | ≥ v2.24 (bundled with Docker Desktop) |
+
+### 1. Clone and Configure
+
+```bash
+git clone https://github.com/yuthav/synergy-marketplace.git
+cd synergy-marketplace
+cp .env.example .env
+```
+
+Edit `.env` with your secrets. The minimum required keys:
+
+```env
+# Postgres (used by docker-compose automatically)
+POSTGRES_USER=synergy
+POSTGRES_PASSWORD=changeme_strong_password
+POSTGRES_DB=synergy_db
+
+# Redis
+REDIS_PASSWORD=changeme_redis_password
+
+# Auth secrets — generate each with: openssl rand -base64 32
+NEXTAUTH_SECRET_MARKETPLACE=your-marketplace-secret
+NEXTAUTH_SECRET_SELLER=your-seller-secret
+NEXTAUTH_SECRET_PLATFORM=your-platform-secret
+
+# OAuth providers
+GOOGLE_CLIENT_ID=...
+GOOGLE_CLIENT_SECRET=...
+GITHUB_CLIENT_ID=...
+GITHUB_CLIENT_SECRET=...
+
+# Stripe
+STRIPE_SECRET_KEY=sk_test_...
+STRIPE_PUBLISHABLE_KEY=pk_test_...
+STRIPE_WEBHOOK_SECRET=whsec_...
+```
+
+### 2. Build and Start the Full Stack
+
+```bash
+# Build all images and start all services in detached mode
+docker compose up --build -d
+```
+
+First build takes ~3–5 minutes (downloads base images, installs deps, compiles Next.js). Subsequent builds are faster due to Docker layer caching.
+
+### 3. Run Database Migrations
+
+Once the containers are running, apply the schema:
+
+```bash
+docker compose exec api node -e "require('./dist/db/migrate').migrate()"
+```
+
+Or connect directly to Postgres:
+
+```bash
+docker compose exec postgres psql -U synergy -d synergy_db
+```
+
+### 4. Access the Applications
+
+| Portal | URL |
+|---|---|
+| 🛒 Marketplace | [http://localhost:3000](http://localhost:3000) |
+| 🏪 Seller Portal | [http://localhost:3001](http://localhost:3001) |
+| 🎛️ Platform HQ | [http://localhost:3002](http://localhost:3002) |
+| ⚡ API Server | [http://localhost:4000](http://localhost:4000) |
+| 📖 API Swagger Docs | [http://localhost:4000/api/v1/docs](http://localhost:4000/api/v1/docs) |
+| 🌐 Nginx Proxy | [http://localhost:80](http://localhost) (routes to marketplace by default) |
+
+### 5. Useful Docker Commands
+
+```bash
+# View running containers and their status
+docker compose ps
+
+# Stream logs from all services
+docker compose logs -f
+
+# Stream logs from a specific service
+docker compose logs -f api
+docker compose logs -f marketplace
+
+# Restart a single service (e.g. after a config change)
+docker compose restart api
+
+# Rebuild a single service without restarting others
+docker compose build marketplace
+docker compose up -d --no-deps marketplace
+
+# Stop all services (preserves volumes)
+docker compose stop
+
+# Stop and remove containers + networks (keeps volumes)
+docker compose down
+
+# ⚠️ Stop and DELETE all data (removes volumes)
+docker compose down -v
+
+# Open a shell inside a container
+docker compose exec api sh
+docker compose exec postgres sh
+```
+
+### Building Individual Images
+
+Each app can be built and run independently:
+
+```bash
+# Build the API image
+docker build -f apps/api/Dockerfile -t synergy-api:latest .
+
+# Build the marketplace image
+docker build -f apps/marketplace/Dockerfile -t synergy-marketplace:latest .
+
+# Run a standalone container
+docker run -p 4000:4000 --env-file .env synergy-api:latest
+```
+
+### Docker File Structure
+
+```
+synergy-marketplace/
+├── docker-compose.yml          # Orchestrates all 7 services
+├── .dockerignore               # Excludes node_modules, .next, .env from build context
+├── nginx/
+│   └── nginx.conf              # Reverse proxy routing for all portals
+└── apps/
+    ├── api/Dockerfile          # 3-stage: deps → tsc build → alpine runner
+    ├── marketplace/Dockerfile  # 3-stage: deps → next build → alpine runner
+    ├── seller-portal/Dockerfile
+    └── platform-mgmt/Dockerfile
+```
+
+> **Note:** All Next.js apps use `output: 'standalone'` in `next.config.ts` which generates a self-contained `server.js` — this produces minimal Docker images without requiring a full `node_modules` installation in the final stage.
+
+### Health Checks
+
+Docker Compose health checks are configured for all stateful services:
+
+| Service | Health Check |
+|---|---|
+| `postgres` | `pg_isready` every 10s |
+| `redis` | `redis-cli ping` every 10s |
+| `api` | `GET /health` every 30s |
+
+Next.js apps start after the API health check passes.
 
 ---
 

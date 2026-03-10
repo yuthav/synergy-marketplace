@@ -1,0 +1,37 @@
+# ─── OS / Editor ──────────────────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+
+# ─── Git ──────────────────────────────────────────────────────────────────────
+.git/
+.gitignore
+
+# ─── Dependencies (resolved inside Docker) ────────────────────────────────────
+node_modules/
+**/node_modules/
+
+# ─── Build outputs ────────────────────────────────────────────────────────────
+.next/
+**/. next/
+dist/
+**/dist/
+build/
+**/.turbo/
+*.tsbuildinfo
+
+# ─── Environment files (passed via docker-compose env_file) ───────────────────
+.env
+.env.*
+!.env.example
+
+# ─── Local dev ────────────────────────────────────────────────────────────────
+*.log
+pnpm-debug.log*
+
+# ─── Docs / CI (not needed in image) ─────────────────────────────────────────
+*.md
+.github/
+nginx/certs/
+docs/
